@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS Users (
+    id IDENTITY,
+    name VARCHAR(255)
+);
+
+CREATE TABLE IF NOT EXISTS Tasks (
+    id IDENTITY,
+    userId BIGINT NOT NULL,
+    description VARCHAR(255),
+    done BOOLEAN
+);
+
+ALTER TABLE Tasks ADD FOREIGN KEY (userId) REFERENCES Users(id);

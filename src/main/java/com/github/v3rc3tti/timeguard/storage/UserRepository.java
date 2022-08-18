@@ -1,4 +1,4 @@
-package com.github.v3rc3tti.timeguard.data;
+package com.github.v3rc3tti.timeguard.storage;
 
 import com.github.v3rc3tti.timeguard.model.User;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,7 +16,10 @@ import java.sql.Types;
 @Repository
 public class UserRepository {
 
-    private static final RowMapper<User> USER_MAPPER = new RowMapper<User>() {
+    private static final String SQL_FIND_ALL = "SELECT * FROM Users";
+    private static final String SQL_FIND_BY_ID = "SELECT * FROM Users WHERE id = ?";
+    private static final String SQL_SAVE = "INSERT INTO Users(name) VALUES (?)";
+    private static final RowMapper<User> USER_MAPPER = new RowMapper<>() {
 
         @Override
         public User mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -31,11 +34,11 @@ public class UserRepository {
     }
 
     public Iterable<User> findAll() {
-        return jdbc.query("SELECT * FROM Users", USER_MAPPER);
+        return jdbc.query(SQL_FIND_ALL, USER_MAPPER);
     }
 
     public User findOne(long id) {
-        return jdbc.queryForObject("SELECT * FROM Users WHERE id = ?",
+        return jdbc.queryForObject(SQL_FIND_BY_ID,
                 new Object[]{id},
                 new int[] {Types.BIGINT},
                 USER_MAPPER);
@@ -45,7 +48,7 @@ public class UserRepository {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbc.update(c -> {
-            PreparedStatement ps = c.prepareStatement("INSERT INTO Users(name) VALUES (?)",
+            PreparedStatement ps = c.prepareStatement(SQL_SAVE,
                     Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, user.getName());
             return ps;
